@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Task, TaskStatus } from './task.model'
 import { v1 as uuid } from 'uuid';
-import { CreateTaskDto, UpdateTaskDto } from './dto/createTask.dto';
+import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 import { GetTaskFilterDto } from './dto/getTasks.filter.dto';
 
 export interface Data {
@@ -39,9 +39,15 @@ export class TasksService {
     }
 
     getSingleTask(id: string): Task {
-        return this.tasks.find(item => item.id === id)
+        const found = this.tasks.find(item => item.id === id)
 
+        if (!found) {
+            throw new NotFoundException(`Task with ${id} not found`)
+        }
+
+        return found
     }
+
 
     createNewTask(createTaskDto: CreateTaskDto): Task {
 
@@ -59,20 +65,32 @@ export class TasksService {
     }
 
     updateTask(updateTaskDto: UpdateTaskDto, id: string): Task {
+        const task = this.getSingleTask(id);
+        const { title, description, status } = updateTaskDto;
 
-        const task = this.getSingleTask(id)
-        const { title, status, description } = updateTaskDto;
+        if (title) {
+            task.title = title;
+        }
+        if (description) {
+            task.description = description;
+        }
+        if (status) {
 
-        task.status = status;
-        task.title = title;
-        task.description = description;
+            // const statusOk = status.toUpperCase()
+            // if (!Object.values(TaskStatus).find(x => x === statusOk)) {
+            //     throw new BadRequestException(`${status} is an invalid status`);
+            // }
 
-        return task
+            task.status = status.toUpperCase() as TaskStatus;
+        }
 
+        return task;
     }
 
     deleteTask(id: string) {
-        this.tasks = this.tasks.filter(item => item.id !== id)
+
+        const found = this.getSingleTask(id)
+        this.tasks = this.tasks.filter(item => item.id !== found.id)
 
         const data: Data = {
             id: id,
