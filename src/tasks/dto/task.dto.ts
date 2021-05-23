@@ -13,8 +13,6 @@ export class CreateTaskDto {
 
 
 export class UpdateTaskDto {
-    title: string
-    description: string
-    
-    @IsEnum(TaskStatus)
-    status:TaskStatus}
+    title?: string
+    description?: string
+    status?:TaskStatus}

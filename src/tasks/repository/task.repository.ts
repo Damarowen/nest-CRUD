@@ -1,5 +1,5 @@
 
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto, UpdateTaskDto } from '../dto/task.dto';
 import { TaskEntity } from '../entity/task.entity'
@@ -61,13 +61,14 @@ export class TaskRepository extends Repository<TaskEntity> {
     }
     if (status) {
 
-      // const statusOk = status.toUpperCase()
-      // if (!Object.values(TaskStatus).find(x => x === statusOk)) {
-      //     throw new BadRequestException(`${status} is an invalid status`);
-      // }
+      const statusOk = status.toUpperCase()
+      if (!Object.values(TaskStatus).find(x => x === statusOk)) {
+          throw new BadRequestException(`${status} is an invalid status`);
+      }
 
       task.status = status.toUpperCase() as TaskStatus;
     }
+    
     await task.save()
     return task;
   }
