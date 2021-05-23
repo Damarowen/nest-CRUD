@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Patch, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task } from './task.model'
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 import { GetTaskFilterDto } from './dto/getTasks.filter.dto';
 import { Data } from './tasks.service'
+import { TaskEntity } from './entity/task.entity';
 
 
 //* karena TasksService injectable maka bisa dimasukin disini
@@ -15,36 +15,33 @@ export class TasksController {
     @Get()
     @UsePipes(ValidationPipe)
     getAllTasks(@Query() filterDto: GetTaskFilterDto ) {
-        if(Object.keys(filterDto).length){
-            return this.tasksService.getFilteredTask(filterDto);
-        }
-        return this.tasksService.getAllTasks();
+        return this.tasksService.getAllTasks(filterDto);
     }
 
     @Get('/:id')
-    getSingleTask(@Param('id') id: string): Task {
+    getSingleTask(@Param('id', ParseIntPipe) id: number): Promise<TaskEntity> {
         return this.tasksService.getSingleTask(id);
     }
 
 
     @Post()
     @UsePipes(ValidationPipe)
-    createTask(@Body() createTaskDto: CreateTaskDto): Task {
+    createTask(@Body() createTaskDto: CreateTaskDto): Promise<TaskEntity> {
         return this.tasksService.createNewTask(createTaskDto);
     }
 
     @Patch('/:id/status')
     @UsePipes(ValidationPipe)
     updateTask(
-      @Param('id') id: string,
+      @Param('id') id: number,
       @Body() updateTaskDto: UpdateTaskDto,
-    ): Task {
+    ): Promise<TaskEntity>  {
       return this.tasksService.updateTask(updateTaskDto, id);
     }
   
 
     @Delete('/:id')
-    deleteTask(@Param('id') id: string): Data {
+    deleteTask(@Param('id', ParseIntPipe) id: number): Promise<Data> {
         return this.tasksService.deleteTask(id)
     }
 
