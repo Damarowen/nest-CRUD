@@ -24,13 +24,12 @@ export class UserRepository extends Repository<UserEntity>{
             const user = new UserEntity();
             user.username = username;
             user.password = bcryptPassword;
-            console.log(user)
             await user.save();
             return user;
 
         } catch (err) {
             console.log(err)
-
+            
             //* if username already been used
             if (err.code === 'ER_DUP_ENTRY') {
                 throw new ConflictException('Username Already Exist')
@@ -64,11 +63,8 @@ export class UserRepository extends Repository<UserEntity>{
         if (!validPassword) {
             throw new BadRequestException(`${password} is an invalid password `);
         }
-        console.log(user)
         return user;
     }
 
-    private async hashPassword(password: string, salt: string): Promise<string> {
-        return bcrypt.hash(password, salt)
-    }
+  
 }
