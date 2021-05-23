@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
+
   type: 'mysql',
   host: 'localhost',
   port: 3306,
@@ -8,6 +9,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   database: 'taskmanagement',
   autoLoadEntities: true,
   synchronize: true,
+  logging: true
 };
 
 
